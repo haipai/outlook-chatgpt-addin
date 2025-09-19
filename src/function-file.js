@@ -1,6 +1,6 @@
 /* global Office */
 
-const ENDPOINT = "http://localhost:8787/draft"; // we'll switch to HTTPS in the next task
+const ENDPOINT = "https://chubby-ducks-sing.loca.lt//draft"; // we'll switch to HTTPS in the next task
 
 Office.onReady(() => { /* ready */ });
 
