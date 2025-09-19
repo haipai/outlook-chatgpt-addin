@@ -10,8 +10,8 @@
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Draft with ChatGPT"/>
   <Description DefaultValue="Select a placeholder and replace it with a polished paragraph."/>
-  <IconUrl DefaultValue="https://<your-username>.github.io/outlook-chatgpt-addin/assets/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://<your-username>.github.io/outlook-chatgpt-addin/assets/icon-80.png"/>
+  <IconUrl DefaultValue="https://haipai.github.io/outlook-chatgpt-addin/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://haipai.github.io/outlook-chatgpt-addin/assets/icon-80.png"/>
 
   <Hosts><Host Name="Mailbox"/></Hosts>
 
