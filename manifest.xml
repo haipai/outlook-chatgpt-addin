@@ -59,7 +59,7 @@
   </Resources>
 
   <AppDomains>
-    <AppDomain>https://haipai.github.io/outlook-chatgpt-addin/manifest.xml</AppDomain>
+    <AppDomain>https://haipai.github.io</AppDomain>
     <!-- later add your backend domain here -->
   </AppDomains>
 </OfficeApp>
