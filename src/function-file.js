@@ -1,38 +1,49 @@
 /* global Office */
+
+const ENDPOINT = "http://localhost:8787/draft"; // we'll switch to HTTPS in the next task
+
 Office.onReady(() => { /* ready */ });
 
-// Point this to your backend once it’s deployed over HTTPS
-const ENDPOINT = "http://localhost:8787/draft";
-
-export async function onDraftClicked(event) {
-  Office.context.mailbox.item.getSelectedDataAsync(
-    Office.CoercionType.Text,
-    async (res) => {
-      if (res.status !== Office.AsyncResultStatus.Succeeded) {
-        return done(event, "Could not read selection.");
-      }
-      const selection = (res.value || "").trim();
-      if (!selection) {
-        return done(event, "Select a placeholder first, e.g., 'help draft: ...'.");
-      }
-
-      const prompt =
-        `Rewrite the text into a clear, friendly, concise email paragraph.\n---\n${selection}\n---\nReturn only the paragraph.`;
-
-      try {
-        const r = await fetch(ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt }),
-        });
-        if (!r.ok) {
-          return done(event, `Service error ${r.status}`);
+async function onDraftClicked(event) {
+  try {
+    Office.context.mailbox.item.getSelectedDataAsync(
+      Office.CoercionType.Text,
+      async (res) => {
+        if (res.status !== Office.AsyncResultStatus.Succeeded) {
+          notify("Could not read selection.");
+          return event.completed();
         }
-        const { text } = await r.json();
-        const output = (text || "").trim() || "(no result)";
+        const selection = (res.value || "").trim();
+        if (!selection) {
+          notify("Select a placeholder first (e.g., 'help draft: ...').");
+          return event.completed();
+        }
+
+        const prompt =
+          `Rewrite the text into a clear, friendly, concise email paragraph.\n---\n${selection}\n---\nReturn only the paragraph.`;
+
+        let text = "";
+        try {
+          const r = await fetch(ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt }),
+          });
+          if (!r.ok) throw new Error(`Service error ${r.status}`);
+          const data = await r.json();
+          text = (data?.text || "").trim();
+        } catch (e) {
+          notify(`Request failed: ${e.message || e}`);
+          return event.completed();
+        }
+
+        if (!text) {
+          notify("No text returned.");
+          return event.completed();
+        }
 
         Office.context.mailbox.item.setSelectedDataAsync(
-          output,
+          text,
           { coercionType: Office.CoercionType.Text },
           (setRes) => {
             if (setRes.status !== Office.AsyncResultStatus.Succeeded) {
@@ -41,11 +52,21 @@ export async function onDraftClicked(event) {
             event.completed();
           }
         );
-      } catch (e) {
-        done(event, String(e && e.message ? e.message : e));
       }
-    }
-  );
+    );
+  } catch (err) {
+    notify(`Unexpected error: ${err.message || err}`);
+    event.completed();
+  }
+}
+
+// REQUIRED for command buttons: register the function name globally
+if (typeof Office !== "undefined" && Office.actions && Office.actions.associate) {
+  Office.actions.associate("onDraftClicked", onDraftClicked);
+} else {
+  // Fallback for older clients
+  // eslint-disable-next-line no-undef
+  window.onDraftClicked = onDraftClicked;
 }
 
 function notify(message) {
@@ -58,4 +79,3 @@ function notify(message) {
     });
   } catch (_) {}
 }
-function done(event, message) { notify(message); try { event.completed(); } catch (_) {} }
