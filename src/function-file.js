@@ -1,6 +1,6 @@
 /* global Office */
 
-const ENDPOINT = "https://piano-solved-meyer-leo.trycloudflare.com/draft"; // we'll switch to HTTPS in the next task
+const ENDPOINT = "https://veteran-owners-ian-annually.trycloudflare.com/draft"; // we'll switch to HTTPS in the next task
 
 Office.onReady(() => { /* ready */ });
 
